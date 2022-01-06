@@ -9,6 +9,9 @@ const Product = ({ pizza }) => {
 
     const [size, setSize] = useState(0);
     const [price, setPrice] = useState(pizza.prices[0]);
+    const [extras, setExtras] = useState([]);
+    const [quantity, setQuantity] = useState(1);
+
 
 
     const changePrice = (number) => {
@@ -27,10 +30,13 @@ const Product = ({ pizza }) => {
 
         if (checked) {
             changePrice(option.price);
+            setExtras((prev) => [...prev, option])
         } else {
             changePrice(-option.price);
+            setExtras(extras.filter((extra) => extra._id !== option._id))
         }
     };
+
 
 
     return (
@@ -75,7 +81,7 @@ const Product = ({ pizza }) => {
                     ))}
                 </div>
                 <div className={styles.add}>
-                    <input type="number" defaultValue={1} className={styles.quantity} />
+                    <input type="number" defaultValue={1} className={styles.quantity} onChange={((e) => setQuantity(e.target.value))} />
                     <button className={styles.button}>Add to Cart</button>
                 </div>
             </div>
