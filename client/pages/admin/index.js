@@ -6,6 +6,7 @@ import { useState } from "react";
 const index = ({ orders, products }) => {
     const [pizzaList, setPizzaList] = useState(products);
     const [orderList, setOrderList] = useState(orders);
+    const status = ["preparing", "on the way", "delievered"];
 
 
 
@@ -15,6 +16,20 @@ const index = ({ orders, products }) => {
             setPizzaList(pizzaList.filter((pizza) => pizza._id !== id))
         } catch (error) {
             console.log(error)
+        }
+    };
+
+    const handleStatus = async (id) => {
+        const item = orderList.filter((order) => order._id === id)[0];
+        const currentStatus = item.status;
+        try {
+            const res = await axios.put("http://localhost:3000/api/orders/" + id, { status: currentStatus + 1 });
+            setOrderList([
+                res.data,
+                ...orderList.filter((order) => order._id !== id),
+            ]);
+        } catch (error) {
+            console.log(error);
         }
     }
 
@@ -71,20 +86,22 @@ const index = ({ orders, products }) => {
                             <th>Action</th>
                         </tr>
                     </tbody>
-                    <tbody>
-                        <tr className={styles.trTitle}>
-                            <td>
-                                {"32322345532".slice(0, 5)}...
-                            </td>
-                            <td>John Doe</td>
-                            <td>$50</td>
-                            <td>paid</td>
-                            <td>preparing</td>
-                            <td>
-                                <button>Next Stage</button>
-                            </td>
-                        </tr>
-                    </tbody>
+                    {orderList.map((order) => (
+                        <tbody key={order._id}>
+                            <tr className={styles.trTitle}>
+                                <td>
+                                    {order._id.slice(0, 5)}...
+                                </td>
+                                <td>{order.customer}</td>
+                                <td>${order.total}</td>
+                                <td>{order.method === 0 ? (<span>Cash</span>) : <span>Paid</span>}</td>
+                                <td>{status[order.status]}</td>
+                                <td>
+                                    <button onClick={() => handleStatus(order._id)}>Next Stage</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    ))}
                 </table>
             </div>
 
